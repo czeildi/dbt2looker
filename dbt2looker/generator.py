@@ -334,7 +334,7 @@ def lookml_measure(measure_name: str, column: models.DbtModelColumn, measure: mo
 def lookml_view_from_dbt_model(model: models.DbtModel, adapter_type: models.SupportedDbtAdapters):
     lookml = {
         'view': {
-            'name': model.name,
+            'name': model.meta.view_name or model.name,
             'sql_table_name': model.relation_name,
             'dimension_groups': lookml_dimension_groups_from_model(model, adapter_type),
             'dimensions': lookml_dimensions_from_model(model, adapter_type),
@@ -359,7 +359,7 @@ def lookml_model_from_dbt_model(model: models.DbtModel, connection_name: str):
         'connection': connection_name,
         'include': '/views/*',
         'explore': {
-            'name': model.name,
+            'name': model.meta.view_name or model.name,
             'description': model.description,
             'joins': [
                 {
@@ -367,11 +367,17 @@ def lookml_model_from_dbt_model(model: models.DbtModel, connection_name: str):
                     'type': join.type.value,
                     'relationship': join.relationship.value,
                     'sql_on': join.sql_on,
+                    'foreign_key': join.foreig_key,
+                    'view_label': join.view_label,
                 }
                 for join in model.meta.joins
             ]
         }
     }
+    if model.meta.label:
+        lookml['label'] = model.meta.label
+    if model.meta.view_label:
+        lookml['view_label'] = model.meta.view_label
     contents = lkml.dump(lookml)
     filename = f'{model.name}.model.lkml'
     return models.LookModelFile(filename=filename, contents=contents)
