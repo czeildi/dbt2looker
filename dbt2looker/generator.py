@@ -260,17 +260,17 @@ def lookml_dimensions_from_model(model: models.DbtModel, adapter_type: models.Su
                 else {}
             ),
             **(
-                {'label': column.meta.dimension.label.value}
+                {'label': column.meta.dimension.label}
                 if (column.meta.dimension.label)
                 else {}
             ),
             **(
-                {'group_label': column.meta.dimension.group_label.value}
+                {'group_label': column.meta.dimension.group_label}
                 if (column.meta.dimension.group_label)
                 else {}
             ),
             **(
-                {'view_label': column.meta.dimension.view_label.value}
+                {'view_label': column.meta.dimension.view_label}
                 if (column.meta.dimension.view_label)
                 else {}
             )
