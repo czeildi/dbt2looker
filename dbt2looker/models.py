@@ -86,6 +86,7 @@ class Dbt2LookerMeasure(BaseModel):
     sql: Optional[str]
     value_format_name: Optional[LookerValueFormatName]
     group_label: Optional[str]
+    view_label: Optional[str]
     label: Optional[str]
     hidden: Optional[LookerHiddenType]
 
@@ -104,6 +105,9 @@ class Dbt2LookerDimension(BaseModel):
     sql: Optional[str]
     description: Optional[str]
     value_format_name: Optional[LookerValueFormatName]
+    group_label: Optional[str]
+    view_label: Optional[str]
+    label: Optional[str]
 
 
 class Dbt2LookerMeta(BaseModel):
