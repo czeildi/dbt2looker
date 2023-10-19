@@ -332,9 +332,11 @@ def lookml_measure(measure_name: str, column: models.DbtModelColumn, measure: mo
 
 
 def lookml_view_from_dbt_model(model: models.DbtModel, adapter_type: models.SupportedDbtAdapters):
+    view_name = model.meta.view_name or model.name
+    
     lookml = {
         'view': {
-            'name': model.meta.view_name or model.name,
+            'name': view_name,
             'sql_table_name': model.relation_name,
             'dimension_groups': lookml_dimension_groups_from_model(model, adapter_type),
             'dimensions': lookml_dimensions_from_model(model, adapter_type),
@@ -343,23 +345,24 @@ def lookml_view_from_dbt_model(model: models.DbtModel, adapter_type: models.Supp
     }
     logging.debug(
         f'Created view from model %s with %d measures, %d dimensions',
-        model.name,
+        view_name,
         len(lookml['view']['measures']),
         len(lookml['view']['dimensions']),
     )
     contents = lkml.dump(lookml)
-    filename = f'{model.name}.view.lkml'
+    filename = f'{view_name}.view.lkml'
     return models.LookViewFile(filename=filename, contents=contents)
 
 
 def lookml_model_from_dbt_model(model: models.DbtModel, connection_name: str):
     # Note: assumes view names = model names
     #       and models are unique across dbt packages in project
+    view_name = model.meta.view_name or model.name
     lookml = {
         'connection': connection_name,
         'include': '/views/*',
         'explore': {
-            'name': model.meta.view_name or model.name,
+            'name': view_name,
             'description': model.description,
             'joins': [
                 {
@@ -379,5 +382,5 @@ def lookml_model_from_dbt_model(model: models.DbtModel, connection_name: str):
     if model.meta.view_label:
         lookml['view_label'] = model.meta.view_label
     contents = lkml.dump(lookml)
-    filename = f'{model.name}.model.lkml'
+    filename = f'{view_name}.model.lkml'
     return models.LookModelFile(filename=filename, contents=contents)
