@@ -183,11 +183,17 @@ looker_scalar_types = ['number', 'yesno', 'string']
 looker_timeframes = [
     'raw',
     'time',
+    'hour',
     'date',
+    'day_of_year',
     'week',
+    'week_of_year',
     'month',
+    'month_num',
+    'month_name',
     'quarter',
-    'year',
+    'quarter_of_year',
+    'year'
 ]
 
 
@@ -210,7 +216,7 @@ def lookml_date_time_dimension_group(column: models.DbtModelColumn, adapter_type
         'sql': column.meta.dimension.sql or f'${{TABLE}}.{column.name}',
         'description': column.meta.dimension.description or column.description,
         'datatype': map_adapter_type_to_looker(adapter_type, column.data_type),
-        'timeframes': ['raw', 'time', 'hour', 'date', 'week', 'month', 'quarter', 'year']
+        'timeframes': looker_timeframes
     }
 
 
@@ -221,7 +227,7 @@ def lookml_date_dimension_group(column: models.DbtModelColumn, adapter_type: mod
         'sql': column.meta.dimension.sql or f'${{TABLE}}.{column.name}',
         'description': column.meta.dimension.description or column.description,
         'datatype': map_adapter_type_to_looker(adapter_type, column.data_type),
-        'timeframes': ['raw', 'date', 'week', 'month', 'quarter', 'year']
+        'timeframes': looker_timeframes
     }
 
 
@@ -251,6 +257,21 @@ def lookml_dimensions_from_model(model: models.DbtModel, adapter_type: models.Su
                 {'value_format_name': column.meta.dimension.value_format_name.value}
                 if (column.meta.dimension.value_format_name
                     and map_adapter_type_to_looker(adapter_type, column.data_type) == 'number')
+                else {}
+            ),
+            **(
+                {'label': column.meta.dimension.label.value}
+                if (column.meta.dimension.label)
+                else {}
+            ),
+            **(
+                {'group_label': column.meta.dimension.group_label.value}
+                if (column.meta.dimension.group_label)
+                else {}
+            ),
+            **(
+                {'view_label': column.meta.dimension.view_label.value}
+                if (column.meta.dimension.view_label)
                 else {}
             )
         }
@@ -301,6 +322,8 @@ def lookml_measure(measure_name: str, column: models.DbtModelColumn, measure: mo
         m['value_format_name'] = measure.value_format_name.value
     if measure.group_label:
         m['group_label'] = measure.group_label
+    if measure.view_label:
+        m['view_label'] = measure.view_label
     if measure.label:
         m['label'] = measure.label
     if measure.hidden:
