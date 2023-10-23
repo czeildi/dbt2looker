@@ -175,7 +175,7 @@ class DbtModel(DbtNode):
     relation_name: str
     db_schema: str = Field(..., alias='schema')
     name: str
-    description: str
+    description: Optional[str]
     columns: Dict[str, DbtModelColumn]
     tags: List[str]
     config: Optional[DbtModelConfig]
