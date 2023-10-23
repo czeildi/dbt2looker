@@ -159,6 +159,9 @@ class Dbt2LookerExploreJoin(BaseModel):
 
 class Dbt2LookerModelMeta(BaseModel):
     joins: Optional[List[Dbt2LookerExploreJoin]] = []
+    view_name: str
+    label: str
+    view_label: str
 
 
 class DbtModelMeta(Dbt2LookerModelMeta):
