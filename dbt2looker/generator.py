@@ -362,25 +362,28 @@ def lookml_model_from_dbt_model(model: models.DbtModel, connection_name: str):
         'connection': connection_name,
         'include': '/views/*',
         'explore': {
-            'name': view_name,
-            'description': model.description,
-            'joins': [
-                {
-                    'name': join.join,
-                    'type': join.type.value,
-                    'relationship': join.relationship.value,
-                    'sql_on': join.sql_on,
-                    'foreign_key': join.foreig_key,
-                    'view_label': join.view_label,
-                }
-                for join in model.config.meta.joins
-            ]
+            'name': view_name
         }
     }
     if model.config.meta.label:
-        lookml['label'] = model.config.meta.label
+        lookml['explore']['label'] = model.config.meta.label
     if model.config.meta.view_label:
-        lookml['view_label'] = model.config.meta.view_label
+        lookml['explore']['view_label'] = model.config.meta.view_label
+        
+    if model.description:
+        lookml['explore']['description'] = model.description
+    lookml['explore']['joins'] = [
+        {
+            'name': join.join,
+            'type': join.type.value,
+            'relationship': join.relationship.value,
+            'sql_on': join.sql_on,
+            'foreign_key': join.foreig_key,
+            'view_label': join.view_label,
+        }
+        for join in model.config.meta.joins
+    ]
+
     contents = lkml.dump(lookml)
     filename = f'{view_name}.model.lkml'
     return models.LookModelFile(filename=filename, contents=contents)

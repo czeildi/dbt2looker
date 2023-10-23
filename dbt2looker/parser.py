@@ -33,18 +33,10 @@ def tags_match(query_tag: str, model: models.DbtModel) -> bool:
 def parse_models(raw_manifest: dict, tag=None) -> List[models.DbtModel]:
     manifest = models.DbtManifest(**raw_manifest)
     
-    model_nodes = [node for node in manifest.nodes.values() if node.resource_type == 'model']
-    
-    for node in model_nodes:
-            try:
-                model.DbtModel(**node)
-            except ValidationError as e:
-                logging.error('Parsing error', e.errors())
-                print(e.errors())
-    
     all_models: List[models.DbtModel] = [
         node
-        for node in model_nodes
+        for node in manifest.nodes.values()
+        if node.resource_type == 'model'
     ]
 
     # Empty model files have many missing parameters

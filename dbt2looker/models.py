@@ -140,7 +140,7 @@ class DbtModelColumnMeta(Dbt2LookerMeta):
 
 class DbtModelColumn(BaseModel):
     name: str
-    description: str
+    description: Optional[str]
     data_type: Optional[str]
     meta: DbtModelColumnMeta
 
@@ -154,14 +154,16 @@ class Dbt2LookerExploreJoin(BaseModel):
     join: str
     type: Optional[LookerJoinType] = LookerJoinType.left_outer
     relationship: Optional[LookerJoinRelationship] = LookerJoinRelationship.many_to_one
-    sql_on: str
+    sql_on: Optional[str]
+    foreign_key: Optional[str]
+    view_label: Optional[str]
 
 
 class Dbt2LookerModelMeta(BaseModel):
     joins: Optional[List[Dbt2LookerExploreJoin]] = []
-    view_name: str
-    label: str
-    view_label: str
+    view_name: Optional[str]
+    label: Optional[str]
+    view_label: Optional[str]
 
 
 class DbtModelMeta(Dbt2LookerModelMeta):
