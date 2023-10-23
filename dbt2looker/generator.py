@@ -332,7 +332,7 @@ def lookml_measure(measure_name: str, column: models.DbtModelColumn, measure: mo
 
 
 def lookml_view_from_dbt_model(model: models.DbtModel, adapter_type: models.SupportedDbtAdapters):
-    view_name = model.meta.view_name or model.name
+    view_name = model.config.meta.view_name or model.name
     
     lookml = {
         'view': {
@@ -357,7 +357,7 @@ def lookml_view_from_dbt_model(model: models.DbtModel, adapter_type: models.Supp
 def lookml_model_from_dbt_model(model: models.DbtModel, connection_name: str):
     # Note: assumes view names = model names
     #       and models are unique across dbt packages in project
-    view_name = model.meta.view_name or model.name
+    view_name = model.config.meta.view_name or model.name
     lookml = {
         'connection': connection_name,
         'include': '/views/*',
@@ -373,14 +373,14 @@ def lookml_model_from_dbt_model(model: models.DbtModel, connection_name: str):
                     'foreign_key': join.foreig_key,
                     'view_label': join.view_label,
                 }
-                for join in model.meta.joins
+                for join in model.config.meta.joins
             ]
         }
     }
-    if model.meta.label:
-        lookml['label'] = model.meta.label
-    if model.meta.view_label:
-        lookml['view_label'] = model.meta.view_label
+    if model.config.meta.label:
+        lookml['label'] = model.config.meta.label
+    if model.config.meta.view_label:
+        lookml['view_label'] = model.config.meta.view_label
     contents = lkml.dump(lookml)
     filename = f'{view_name}.model.lkml'
     return models.LookModelFile(filename=filename, contents=contents)

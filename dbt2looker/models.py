@@ -167,6 +167,8 @@ class Dbt2LookerModelMeta(BaseModel):
 class DbtModelMeta(Dbt2LookerModelMeta):
     pass
 
+class DbtModelConfig(BaseModel):
+    meta: Optional[DbtModelMeta]
 
 class DbtModel(DbtNode):
     resource_type: Literal['model']
@@ -176,7 +178,7 @@ class DbtModel(DbtNode):
     description: str
     columns: Dict[str, DbtModelColumn]
     tags: List[str]
-    meta: DbtModelMeta
+    config: Optional[DbtModelConfig]
 
     @validator('columns')
     def case_insensitive_column_names(cls, v: Dict[str, DbtModelColumn]):
